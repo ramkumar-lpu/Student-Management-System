@@ -1,0 +1,643 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>Search Students - LPU</title>-->
+<!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">-->
+<!--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">-->
+<!--</head>-->
+<!--<body class="bg-light">-->
+<!--<nav class="navbar navbar-expand-lg navbar-dark bg-dark">-->
+<!--    <div class="container">-->
+<!--        <a class="navbar-brand" href="/">-->
+<!--            <i class="fas fa-graduation-cap"></i> LPU Student Management System-->
+<!--        </a>-->
+<!--        <div class="navbar-nav">-->
+<!--            <a class="nav-link" href="/">Home</a>-->
+<!--            <a class="nav-link active" href="/search">Search</a>-->
+<!--            <a class="nav-link" href="/statistics">Statistics</a>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</nav>-->
+
+<!--<div class="container mt-4">-->
+<!--    &lt;!&ndash; Search Form &ndash;&gt;-->
+<!--    <div class="card mb-4">-->
+<!--        <div class="card-header bg-primary text-white">-->
+<!--            <h5 class="mb-0"><i class="fas fa-search"></i> Search Students</h5>-->
+<!--        </div>-->
+<!--        <div class="card-body">-->
+<!--            <form th:action="@{/search}" method="post">-->
+<!--                <div class="row g-3 align-items-end">-->
+<!--                    <div class="col-md-4">-->
+<!--                        <label class="form-label fw-bold">Search Type</label>-->
+<!--                        <select class="form-select" name="searchType" required>-->
+<!--                            <option value="rollNo">By Roll Number</option>-->
+<!--                            <option value="name">By Name</option>-->
+<!--                            <option value="course">By Course</option>-->
+<!--                        </select>-->
+<!--                    </div>-->
+<!--                    <div class="col-md-6">-->
+<!--                        <label class="form-label fw-bold">Search Keyword</label>-->
+<!--                        <input type="text" class="form-control" name="keyword"-->
+<!--                               placeholder="Enter search keyword..." required-->
+<!--                               th:value="${keyword}">-->
+<!--                    </div>-->
+<!--                    <div class="col-md-2">-->
+<!--                        <button type="submit" class="btn btn-success w-100">-->
+<!--                            <i class="fas fa-search"></i> Search-->
+<!--                        </button>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </form>-->
+<!--        </div>-->
+<!--    </div>-->
+
+<!--    &lt;!&ndash; Search Results &ndash;&gt;-->
+<!--    <div th:if="${message}">-->
+<!--        <div th:if="${#strings.startsWith(message, '✅')}" class="alert alert-success">-->
+<!--            <i class="fas fa-check-circle"></i> <span th:text="${message}"></span>-->
+<!--        </div>-->
+<!--        <div th:if="${!#strings.startsWith(message, '✅')}" class="alert alert-danger">-->
+<!--            <i class="fas fa-exclamation-circle"></i> <span th:text="${message}"></span>-->
+<!--        </div>-->
+<!--    </div>-->
+
+<!--    <div th:if="${searchResults != null and !searchResults.empty}">-->
+<!--        <div class="card">-->
+<!--            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">-->
+<!--                <h5 class="mb-0"><i class="fas fa-list"></i> Search Results</h5>-->
+<!--                <span class="badge bg-light text-dark">-->
+<!--                        Found: <span th:text="${searchResults.size()}">0</span> student(s)-->
+<!--                    </span>-->
+<!--            </div>-->
+<!--            <div class="card-body">-->
+<!--                <div class="table-responsive">-->
+<!--                    <table class="table table-striped table-hover">-->
+<!--                        <thead class="table-dark">-->
+<!--                        <tr>-->
+<!--                            <th>Roll No</th>-->
+<!--                            <th>Name</th>-->
+<!--                            <th>Age</th>-->
+<!--                            <th>Email</th>-->
+<!--                            <th>Course</th>-->
+<!--                            <th>Marks</th>-->
+<!--                            <th>Grade</th>-->
+<!--                            <th>Status</th>-->
+<!--                            <th>Actions</th>-->
+<!--                        </tr>-->
+<!--                        </thead>-->
+<!--                        <tbody>-->
+<!--                        <tr th:each="student : ${searchResults}">-->
+<!--                            <td th:text="${student.rollNo}"></td>-->
+<!--                            <td th:text="${student.name}"></td>-->
+<!--                            <td th:text="${student.age}"></td>-->
+<!--                            <td th:text="${student.email}"></td>-->
+<!--                            <td th:text="${student.course}"></td>-->
+<!--                            <td th:text="${student.marks}"></td>-->
+<!--                            <td>-->
+<!--                                <span th:if="${student.marks >= 90}" class="badge bg-success" th:text="'A+'"></span>-->
+<!--                                <span th:if="${student.marks >= 80 and student.marks < 90}" class="badge bg-primary" th:text="'A'"></span>-->
+<!--                                <span th:if="${student.marks >= 70 and student.marks < 80}" class="badge bg-info" th:text="'B+'"></span>-->
+<!--                                <span th:if="${student.marks >= 60 and student.marks < 70}" class="badge bg-info" th:text="'B'"></span>-->
+<!--                                <span th:if="${student.marks >= 50 and student.marks < 60}" class="badge bg-warning text-dark" th:text="'C'"></span>-->
+<!--                                <span th:if="${student.marks >= 40 and student.marks < 50}" class="badge bg-warning text-dark" th:text="'D'"></span>-->
+<!--                                <span th:if="${student.marks < 40}" class="badge bg-danger" th:text="'F'"></span>-->
+<!--                            </td>-->
+<!--                            <td>-->
+<!--                                <span th:if="${student.marks >= 40}" class="badge bg-success">PASS</span>-->
+<!--                                <span th:if="${student.marks < 40}" class="badge bg-danger">FAIL</span>-->
+<!--                            </td>-->
+<!--                            <td>-->
+<!--                                <div class="btn-group btn-group-sm">-->
+<!--                                    <a th:href="@{/id-card/{rollNo}(rollNo=${student.rollNo})}"-->
+<!--                                       class="btn btn-info btn-sm me-1" target="_blank">-->
+<!--                                        <i class="fas fa-id-card"></i>-->
+<!--                                    </a>-->
+<!--                                    <a th:href="@{/}" class="btn btn-primary btn-sm">-->
+<!--                                        <i class="fas fa-home"></i>-->
+<!--                                    </a>-->
+<!--                                </div>-->
+<!--                            </td>-->
+<!--                        </tr>-->
+<!--                        </tbody>-->
+<!--                    </table>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+
+<!--<footer class="bg-dark text-white text-center py-3 mt-5">-->
+<!--    <div class="container">-->
+<!--        <p class="mb-0">-->
+<!--            <i class="fas fa-graduation-cap"></i>-->
+<!--            Student Management System - Developed for LPU-->
+<!--        </p>-->
+<!--    </div>-->
+<!--</footer>-->
+
+<!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>-->
+<!--</body>-->
+<!--</html>-->
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Students - LPU</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #2c3e50;
+            --border-color: #e9ecef;
+            --shadow: 0 10px 30px rgba(0,0,0,0.1);
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --text-color: #ffffff;
+            --border-color: #404040;
+            --shadow: 0 10px 30px rgba(0,0,0,0.3);
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            padding: 10px 15px;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .navbar-modern {
+            background: var(--gradient) !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .hero-section {
+            background: var(--gradient);
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="rgba(255,255,255,0.1)"><polygon points="1000,100 1000,0 0,100"/></svg>');
+            background-size: cover;
+        }
+
+        .search-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .search-header {
+            background: var(--gradient);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .search-body {
+            padding: 30px;
+        }
+
+        .form-control-modern {
+            background: var(--bg-color);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 15px;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        .form-control-modern:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .btn-modern {
+            background: var(--gradient);
+            border: none;
+            border-radius: 12px;
+            padding: 12px 30px;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            color: white;
+        }
+
+        .table-modern {
+            background: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .table-modern thead {
+            background: var(--gradient);
+            color: white;
+        }
+
+        .table-modern th {
+            border: none;
+            padding: 15px;
+            font-weight: 600;
+        }
+
+        .table-modern td {
+            border-color: var(--border-color);
+            padding: 15px;
+            vertical-align: middle;
+        }
+
+        .student-row:hover {
+            background: rgba(52, 152, 219, 0.1);
+            transform: scale(1.01);
+            transition: all 0.3s ease;
+        }
+
+        .badge-modern {
+            border-radius: 20px;
+            padding: 6px 12px;
+            font-size: 0.75em;
+            font-weight: 600;
+        }
+
+        .alert-modern {
+            border-radius: 15px;
+            border: none;
+            box-shadow: var(--shadow);
+            padding: 15px 20px;
+            margin-bottom: 25px;
+        }
+
+        .alert-success-modern {
+            background: rgba(39, 174, 96, 0.1);
+            color: var(--success-color);
+            border-left: 4px solid var(--success-color);
+        }
+
+        .alert-danger-modern {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--accent-color);
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .floating-action {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+        }
+
+        .action-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--gradient);
+            color: white;
+            border: none;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1) rotate(10deg);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(52, 152, 219, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); }
+        }
+
+        .search-highlight {
+            background: linear-gradient(120deg, #a8edea 0%, #fed6e3 100%);
+            padding: 2px 5px;
+            border-radius: 5px;
+        }
+
+        .results-count {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 10px 20px;
+            box-shadow: var(--shadow);
+            display: inline-block;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--success-color);
+        }
+
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 40px 0;
+            }
+
+            .search-body {
+                padding: 20px;
+            }
+
+            .floating-action {
+                bottom: 20px;
+                right: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Theme Toggle -->
+<div class="theme-toggle" id="themeToggle">
+    <i class="fas fa-moon" id="themeIcon"></i>
+</div>
+
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark navbar-modern">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/">
+            <i class="fas fa-graduation-cap me-2"></i>
+            LPU Student Management
+        </a>
+        <div class="navbar-nav ms-auto">
+            <a class="nav-link" href="/">
+                <i class="fas fa-home me-1"></i>Dashboard
+            </a>
+            <a class="nav-link active" href="/search">
+                <i class="fas fa-search me-1"></i>Search
+            </a>
+            <a class="nav-link" href="/statistics">
+                <i class="fas fa-chart-bar me-1"></i>Analytics
+            </a>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <h1 class="display-4 fw-bold mb-4">Find Students</h1>
+                <p class="lead mb-4">Quickly locate student records with our advanced search system</p>
+                <div class="d-flex gap-3 justify-content-center flex-wrap">
+                        <span class="badge bg-light text-dark fs-6 p-3">
+                            <i class="fas fa-search me-2"></i>
+                            Multiple Search Options
+                        </span>
+                    <span class="badge bg-light text-dark fs-6 p-3">
+                            <i class="fas fa-bolt me-2"></i>
+                            Instant Results
+                        </span>
+                    <span class="badge bg-light text-dark fs-6 p-3">
+                            <i class="fas fa-filter me-2"></i>
+                            Smart Filtering
+                        </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main Content -->
+<div class="container py-5">
+    <!-- Search Form -->
+    <div class="search-card">
+        <div class="search-header">
+            <h3 class="mb-0"><i class="fas fa-search me-2"></i>Advanced Student Search</h3>
+        </div>
+        <div class="search-body">
+            <form th:action="@{/search}" method="post">
+                <div class="row g-4 align-items-end">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Search Type</label>
+                        <select class="form-select form-control-modern" name="searchType" required>
+                            <option value="rollNo">By Roll Number</option>
+                            <option value="name">By Name</option>
+                            <option value="course">By Course</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Search Keyword</label>
+                        <input type="text" class="form-control form-control-modern" name="keyword"
+                               placeholder="Enter search keyword..." required
+                               th:value="${keyword}">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-modern w-100">
+                            <i class="fas fa-search me-2"></i> Search
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Messages -->
+    <div th:if="${message}">
+        <div th:if="${#strings.startsWith(message, '✅')}" class="alert alert-success-modern alert-modern">
+            <i class="fas fa-check-circle me-2"></i> <span th:text="${message}"></span>
+        </div>
+        <div th:if="${!#strings.startsWith(message, '✅')}" class="alert alert-danger-modern alert-modern">
+            <i class="fas fa-exclamation-circle me-2"></i> <span th:text="${message}"></span>
+        </div>
+    </div>
+
+    <!-- Search Results -->
+    <div th:if="${searchResults != null and !searchResults.empty}">
+        <div class="results-count">
+            <i class="fas fa-list me-2"></i>
+            Found: <span th:text="${searchResults.size()}">0</span> student(s)
+        </div>
+
+        <div class="table-modern">
+            <table class="table table-hover mb-0">
+                <thead>
+                <tr>
+                    <th>Roll No</th>
+                    <th>Name</th>
+                    <th>Age</th>
+                    <th>Email</th>
+                    <th>Course</th>
+                    <th>Marks</th>
+                    <th>Grade</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="student : ${searchResults}" class="student-row">
+                    <td th:text="${student.rollNo}"></td>
+                    <td th:text="${student.name}"></td>
+                    <td th:text="${student.age}"></td>
+                    <td th:text="${student.email}"></td>
+                    <td th:text="${student.course}"></td>
+                    <td th:text="${student.marks}"></td>
+                    <td>
+                        <span th:if="${student.marks >= 90}" class="badge badge-modern bg-success">A+</span>
+                        <span th:if="${student.marks >= 80 and student.marks < 90}" class="badge badge-modern bg-primary">A</span>
+                        <span th:if="${student.marks >= 70 and student.marks < 80}" class="badge badge-modern bg-info">B+</span>
+                        <span th:if="${student.marks >= 60 and student.marks < 70}" class="badge badge-modern bg-info">B</span>
+                        <span th:if="${student.marks >= 50 and student.marks < 60}" class="badge badge-modern bg-warning text-dark">C</span>
+                        <span th:if="${student.marks >= 40 and student.marks < 50}" class="badge badge-modern bg-warning text-dark">D</span>
+                        <span th:if="${student.marks < 40}" class="badge badge-modern bg-danger">F</span>
+                    </td>
+                    <td>
+                        <span th:if="${student.marks >= 40}" class="badge badge-modern bg-success">PASS</span>
+                        <span th:if="${student.marks < 40}" class="badge badge-modern bg-danger">FAIL</span>
+                    </td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            <a th:href="@{/id-card/{rollNo}(rollNo=${student.rollNo})}"
+                               class="btn btn-info btn-sm me-1" target="_blank" title="View ID Card">
+                                <i class="fas fa-id-card"></i>
+                            </a>
+                            <a th:href="@{/}" class="btn btn-primary btn-sm" title="Go to Dashboard">
+                                <i class="fas fa-home"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div th:if="${searchResults != null and searchResults.empty}" class="text-center py-5">
+        <i class="fas fa-search fa-5x text-muted mb-3"></i>
+        <h4 class="text-muted">No Students Found</h4>
+        <p class="text-muted">Try adjusting your search criteria or browse all students on the dashboard.</p>
+        <a href="/" class="btn btn-modern mt-3">
+            <i class="fas fa-home me-2"></i>Go to Dashboard
+        </a>
+    </div>
+</div>
+
+<!-- Floating Action Buttons -->
+<div class="floating-action">
+    <button class="action-btn pulse" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" title="Scroll to Top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+    <button class="action-btn" onclick="window.print()" title="Print Page">
+        <i class="fas fa-print"></i>
+    </button>
+    <a href="/" class="action-btn" title="Dashboard">
+        <i class="fas fa-home"></i>
+    </a>
+</div>
+
+<!-- Footer -->
+<footer class="bg-dark text-white text-center py-4 mt-5">
+    <div class="container">
+        <p class="mb-0">
+            <i class="fas fa-graduation-cap"></i>
+            Student Management System - Developed By Ram kumar
+        </p>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Theme Toggle Functionality
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const body = document.body;
+
+    // Check for saved theme or prefer-color-scheme
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    if (savedTheme === 'dark') {
+        body.setAttribute('data-theme', 'dark');
+        themeIcon.className = 'fas fa-sun';
+    }
+
+    themeToggle.addEventListener('click', () => {
+        if (body.getAttribute('data-theme') === 'dark') {
+            body.removeAttribute('data-theme');
+            themeIcon.className = 'fas fa-moon';
+            localStorage.setItem('theme', 'light');
+        } else {
+            body.setAttribute('data-theme', 'dark');
+            themeIcon.className = 'fas fa-sun';
+            localStorage.setItem('theme', 'dark');
+        }
+    });
+
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.querySelector(this.getAttribute('href')).scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+    });
+
+    // Add loading animation
+    document.addEventListener('DOMContentLoaded', function() {
+        const cards = document.querySelectorAll('.search-card');
+        cards.forEach((card, index) => {
+            card.style.animationDelay = `${index * 0.1}s`;
+        });
+    });
+</script>
+</body>
+</html>

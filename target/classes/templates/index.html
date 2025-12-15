@@ -1,0 +1,1236 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management System - LPU</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --info-color: #17a2b8;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #2c3e50;
+            --light-text-color: #6c757d;
+            --border-color: #e9ecef;
+            --shadow: 0 10px 30px rgba(0,0,0,0.08);
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        [data-theme="dark"] {
+            --primary-color: #4a9eff;
+            --secondary-color: #1a1a2e;
+            --accent-color: #ff6b6b;
+            --success-color: #2ecc71;
+            --warning-color: #f1c40f;
+            --info-color: #3498db;
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #ffffff;
+            --light-text-color: #b0b0b0;
+            --border-color: #333333;
+            --shadow: 0 10px 30px rgba(0,0,0,0.3);
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-secondary: linear-gradient(135deg, #ff6b6b 0%, #ffa726 100%);
+            --gradient-success: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            min-height: 100vh;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            background: var(--card-bg);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+        }
+
+        .theme-toggle:hover {
+            transform: rotate(15deg) scale(1.1);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .navbar-modern {
+            background: var(--gradient) !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+        }
+
+        .hero-section {
+            background: var(--gradient);
+            color: white !important;
+            padding: 100px 0 80px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%);
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(255,255,255,0.1)" d="M0,224L48,218.7C96,213,192,203,288,197.3C384,192,480,192,576,181.3C672,171,768,149,864,154.7C960,160,1056,192,1152,192C1248,192,1344,160,1392,144L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.3;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-content * {
+            color: white !important;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 40px;
+        }
+
+        .stat-badge {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 15px 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-badge:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: var(--gradient);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+
+        .stat-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 20px;
+            background: var(--gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            color: white;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover .stat-icon {
+            transform: rotate(360deg) scale(1.1);
+        }
+
+        .form-modern {
+            background: var(--card-bg);
+            border-radius: 25px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .form-modern:hover {
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .form-header {
+            background: var(--gradient);
+            color: white !important;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-header * {
+            color: white !important;
+        }
+
+        .form-header::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .form-modern:hover .form-header::after {
+            transform: translateX(100%);
+        }
+
+        .form-body {
+            padding: 40px;
+        }
+
+        .form-control-modern {
+            background: var(--bg-color);
+            border: 2px solid var(--border-color);
+            border-radius: 15px;
+            padding: 15px 20px;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .form-control-modern:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.1);
+            transform: translateY(-3px);
+            background: var(--card-bg);
+            color: var(--text-color);
+        }
+
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-modern {
+            background: var(--gradient);
+            border: none;
+            border-radius: 15px;
+            padding: 15px 40px;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-modern::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-modern:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            color: white;
+        }
+
+        .btn-modern:hover::before {
+            left: 100%;
+        }
+
+        .table-modern {
+            background: var(--card-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .table-modern thead {
+            background: var(--gradient);
+            color: white;
+        }
+
+        .table-modern th {
+            border: none;
+            padding: 20px;
+            font-weight: 600;
+            font-size: 1rem;
+            position: relative;
+            color: white;
+        }
+
+        .table-modern th::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 20px;
+            right: 20px;
+            height: 2px;
+            background: rgba(255,255,255,0.2);
+        }
+
+        .table-modern td {
+            border-color: var(--border-color);
+            padding: 20px;
+            vertical-align: middle;
+            transition: all 0.3s ease;
+            color: var(--text-color);
+        }
+
+        .student-row:hover td {
+            background: rgba(52, 152, 219, 0.05);
+            transform: scale(1.01);
+        }
+
+        .student-row {
+            border-left: 4px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .student-row:hover {
+            border-left-color: var(--primary-color);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .badge-modern {
+            border-radius: 12px;
+            padding: 8px 16px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: white;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-action {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            color: white;
+        }
+
+        .btn-action-edit {
+            background: var(--gradient-success);
+        }
+
+        .btn-action-id {
+            background: var(--gradient);
+        }
+
+        .btn-action-delete {
+            background: var(--gradient-secondary);
+        }
+
+        .btn-action:hover {
+            transform: translateY(-3px) scale(1.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .floating-action {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .action-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--gradient);
+            color: white;
+            border: none;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3em;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1) rotate(10deg);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        }
+
+        .action-btn:hover::before {
+            left: 100%;
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 20px rgba(52, 152, 219, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(52, 152, 219, 0);
+            }
+        }
+
+        .section-title {
+            position: relative;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: var(--gradient);
+            border-radius: 2px;
+        }
+
+        .container {
+            max-width: 1400px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .empty-icon {
+            font-size: 5rem;
+            color: var(--border-color);
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .footer {
+            background: var(--secondary-color);
+            color: white !important;
+            padding: 40px 0;
+            margin-top: 80px;
+            position: relative;
+        }
+
+        .footer * {
+            color: white !important;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: var(--gradient);
+        }
+
+        .input-group-modern {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .input-group-modern input {
+            border: none;
+            padding: 12px 20px;
+            background: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .input-group-modern button {
+            border: none;
+            padding: 12px 25px;
+            background: var(--gradient);
+            color: white;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 60px 0 40px;
+                clip-path: polygon(0 0, 100% 0, 100% 95%, 0 100%);
+            }
+
+            .stat-card {
+                margin-bottom: 20px;
+            }
+
+            .floating-action {
+                bottom: 20px;
+                right: 20px;
+            }
+
+            .action-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 1.1em;
+            }
+
+            .form-body {
+                padding: 25px;
+            }
+
+            .table-modern td, .table-modern th {
+                padding: 12px;
+            }
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--gradient);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-color);
+        }
+
+        /* Alert Styles */
+        .alert {
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: none;
+            margin-bottom: 20px;
+            color: white !important;
+        }
+
+        .alert * {
+            color: white !important;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+        }
+
+        .alert-danger {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+
+        .alert-warning {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+        }
+
+        .btn-close {
+            filter: brightness(0) invert(1);
+        }
+
+        /* Text color fixes */
+        .text-muted {
+            color: var(--light-text-color) !important;
+        }
+
+        .opacity-75 {
+            opacity: 0.75 !important;
+        }
+
+        /* Form validation errors */
+        .text-danger {
+            color: #ff6b6b !important;
+        }
+
+        /* Table text colors */
+        .table-hover tbody tr:hover {
+            --bs-table-hover-color: var(--text-color);
+        }
+
+        /* Input placeholder color */
+        .form-control-modern::placeholder {
+            color: var(--light-text-color);
+        }
+
+        /* Bootstrap overrides for dark mode */
+        .card, .modal-content, .dropdown-menu, .list-group-item {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            border-color: var(--border-color);
+        }
+
+        .text-dark {
+            color: var(--text-color) !important;
+        }
+
+        .bg-light {
+            background-color: var(--bg-color) !important;
+        }
+
+        .border-light {
+            border-color: var(--border-color) !important;
+        }
+    </style>
+</head>
+<body>
+<!-- Theme Toggle -->
+<div class="theme-toggle" id="themeToggle">
+    <i class="fas fa-moon" id="themeIcon"></i>
+</div>
+
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark navbar-modern">
+    <div class="container">
+        <a class="navbar-brand fw-bold d-flex align-items-center" href="/">
+            <i class="fas fa-graduation-cap me-2 fa-2x"></i>
+            <div>
+                <div class="fs-4">LPU Student Management</div>
+                <div class="fs-6 opacity-75">Academic Administration Platform</div>
+            </div>
+        </a>
+        <div class="navbar-nav ms-auto">
+            <a class="nav-link active d-flex align-items-center" href="/">
+                <i class="fas fa-home me-2"></i>
+                <span>Dashboard</span>
+            </a>
+            <a class="nav-link d-flex align-items-center" href="/search">
+                <i class="fas fa-search me-2"></i>
+                <span>Search</span>
+            </a>
+            <a class="nav-link d-flex align-items-center" href="/statistics">
+                <i class="fas fa-chart-bar me-2"></i>
+                <span>Analytics</span>
+            </a>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="hero-content">
+            <h1 class="display-4 fw-bold mb-4">Student Management System</h1>
+            <p class="lead mb-4 fs-4">Streamline academic administration with our modern, intuitive platform</p>
+            <div class="hero-stats">
+                <div class="stat-badge">
+                    <i class="fas fa-users fa-2x"></i>
+                    <div>
+                        <div class="fs-3 fw-bold" th:text="${totalStudents}">0</div>
+                        <div class="fs-6">Total Students</div>
+                    </div>
+                </div>
+                <div class="stat-badge">
+                    <i class="fas fa-chart-line fa-2x"></i>
+                    <div>
+                        <div class="fs-3 fw-bold" th:text="${averageMarks} ? ${averageMarks} : '0.00'">0.00</div>
+                        <div class="fs-6">Average Marks</div>
+                    </div>
+                </div>
+                <div class="stat-badge">
+                    <i class="fas fa-trophy fa-2x"></i>
+                    <div>
+                        <div class="fs-3 fw-bold" th:text="${topper != null ? topper.name : 'N/A'}">N/A</div>
+                        <div class="fs-6">Top Performer</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Success/Error Messages -->
+<div class="container mt-4">
+    <!-- Success Message -->
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>
+        <span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <!-- Error Message -->
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        <span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <!-- General Error -->
+    <div th:if="${error}" class="alert alert-warning alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="container py-5">
+    <!-- Statistics Cards -->
+    <div class="row mb-5 fade-in-up">
+        <div class="col-md-3 mb-4">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3 class="fw-bold display-6" th:text="${totalStudents}">0</h3>
+                <p class="text-muted mb-0 fs-5">Total Students</p>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3 class="fw-bold display-6" th:text="${averageMarks} ?: '0.00'">0.00</h3>
+                <p class="text-muted mb-0 fs-5">Average Marks</p>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <h3 class="fw-bold display-6" th:text="${maxMarks} ?: '0'">0</h3>
+                <p class="text-muted mb-0 fs-5">Highest Marks</p>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <h3 class="fw-bold display-6" th:text="${minMarks} ?: '0'">0</h3>
+                <p class="text-muted mb-0 fs-5">Lowest Marks</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Student Form -->
+    <div class="row mb-5 fade-in-up" style="animation-delay: 0.2s">
+        <div class="col-12">
+            <div class="form-modern">
+                <div class="form-header">
+                    <h3 class="mb-0 fs-2"><i class="fas fa-user-plus me-2"></i>Register New Student</h3>
+                    <p class="mt-2 opacity-75">Fill in the details to add a new student to the system</p>
+                </div>
+                <div class="form-body">
+                    <form id="addStudentForm" action="/add" method="post" onsubmit="return validateForm()">
+                        <div class="row g-4">
+                            <div class="col-md-2">
+                                <label class="form-label"><i class="fas fa-hashtag"></i>Roll Number</label>
+                                <input type="number" class="form-control form-control-modern" name="rollNo" id="rollNo"
+                                       placeholder="Enter roll no" required min="1" oninput="validateRollNo()">
+                                <small class="text-danger" id="rollNoError" style="display: none;">Roll number must be positive!</small>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label"><i class="fas fa-user"></i>Full Name</label>
+                                <input type="text" class="form-control form-control-modern" name="name" id="name"
+                                       placeholder="Enter full name" required oninput="validateName()">
+                                <small class="text-danger" id="nameError" style="display: none;">Name is required!</small>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label"><i class="fas fa-birthday-cake"></i>Age</label>
+                                <input type="number" class="form-control form-control-modern" name="age" id="age"
+                                       placeholder="Age" required min="15" max="60" oninput="validateAge()">
+                                <small class="text-danger" id="ageError" style="display: none;">Age must be 15-60!</small>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label"><i class="fas fa-envelope"></i>Email Address</label>
+                                <input type="email" class="form-control form-control-modern" name="email" id="email"
+                                       placeholder="student@lpu.in" required oninput="validateEmail()">
+                                <small class="text-danger" id="emailError" style="display: none;">Valid email required!</small>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label"><i class="fas fa-book"></i>Course</label>
+                                <input type="text" class="form-control form-control-modern" name="course" id="course"
+                                       placeholder="B.Tech CSE" required oninput="validateCourse()">
+                                <small class="text-danger" id="courseError" style="display: none;">Course is required!</small>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label"><i class="fas fa-percentage"></i>Marks</label>
+                                <input type="number" class="form-control form-control-modern" name="marks" id="marks"
+                                       placeholder="0-100" required min="0" max="100" oninput="validateMarks()">
+                                <small class="text-danger" id="marksError" style="display: none;">Marks must be 0-100!</small>
+                            </div>
+                        </div>
+                        <div class="text-center mt-4 pt-3">
+                            <button type="submit" class="btn btn-modern btn-lg px-5" id="submitBtn">
+                                <i class="fas fa-plus-circle me-2"></i>Add Student
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Students Table -->
+    <div class="row fade-in-up" style="animation-delay: 0.4s">
+        <div class="col-12">
+            <h3 class="section-title mb-4"><i class="fas fa-list me-2"></i>Student Records</h3>
+            <div class="table-modern">
+                <table class="table table-hover mb-0">
+                    <thead>
+                    <tr>
+                        <th><i class="fas fa-hashtag me-1"></i>Roll No</th>
+                        <th><i class="fas fa-user me-1"></i>Name</th>
+                        <th><i class="fas fa-calendar me-1"></i>Age</th>
+                        <th><i class="fas fa-envelope me-1"></i>Email</th>
+                        <th><i class="fas fa-book me-1"></i>Course</th>
+                        <th><i class="fas fa-percentage me-1"></i>Marks</th>
+                        <th><i class="fas fa-graduation-cap me-1"></i>Grade</th>
+                        <th><i class="fas fa-flag me-1"></i>Status</th>
+                        <th><i class="fas fa-cogs me-1"></i>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="student : ${students}" class="student-row">
+                        <td th:text="${student.rollNo}"></td>
+                        <td th:text="${student.name}"></td>
+                        <td th:text="${student.age}"></td>
+                        <td th:text="${student.email}"></td>
+                        <td th:text="${student.course}"></td>
+                        <td th:text="${student.marks}"></td>
+                        <td>
+                            <span th:if="${student.marks >= 90}" class="badge badge-modern" style="background: linear-gradient(135deg, #27ae60, #2ecc71)">A+</span>
+                            <span th:if="${student.marks >= 80 and student.marks < 90}" class="badge badge-modern" style="background: linear-gradient(135deg, #3498db, #2980b9)">A</span>
+                            <span th:if="${student.marks >= 70 and student.marks < 80}" class="badge badge-modern" style="background: linear-gradient(135deg, #9b59b6, #8e44ad)">B+</span>
+                            <span th:if="${student.marks >= 60 and student.marks < 70}" class="badge badge-modern" style="background: linear-gradient(135deg, #3498db, #2980b9)">B</span>
+                            <span th:if="${student.marks >= 50 and student.marks < 60}" class="badge badge-modern" style="background: linear-gradient(135deg, #f39c12, #e67e22)">C</span>
+                            <span th:if="${student.marks >= 40 and student.marks < 50}" class="badge badge-modern" style="background: linear-gradient(135deg, #f39c12, #e67e22)">D</span>
+                            <span th:if="${student.marks < 40}" class="badge badge-modern" style="background: linear-gradient(135deg, #e74c3c, #c0392b)">F</span>
+                        </td>
+                        <td>
+                            <span th:if="${student.marks >= 40}" class="badge badge-modern" style="background: linear-gradient(135deg, #27ae60, #2ecc71)">PASS</span>
+                            <span th:if="${student.marks < 40}" class="badge badge-modern" style="background: linear-gradient(135deg, #e74c3c, #c0392b)">FAIL</span>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <form th:action="@{/update-marks}" method="post" class="d-inline">
+                                    <input type="hidden" name="rollNo" th:value="${student.rollNo}">
+                                    <div class="input-group input-group-modern" style="width: 140px;">
+                                        <input type="number" name="marks" th:value="${student.marks}"
+                                               class="form-control" style="border: none;" min="0" max="100" required>
+                                        <button type="submit" class="btn-action btn-action-edit" title="Update Marks">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                    </div>
+                                </form>
+
+                                <a th:href="@{/id-card/{rollNo}(rollNo=${student.rollNo})}"
+                                   class="btn-action btn-action-id" target="_blank" title="View ID Card">
+                                    <i class="fas fa-id-card"></i>
+                                </a>
+
+                                <form th:action="@{/delete}" method="post" class="d-inline" onsubmit="return confirmDelete(this, '${student.name}')">
+                                    <input type="hidden" name="rollNo" th:value="${student.rollNo}">
+                                    <button type="submit" class="btn-action btn-action-delete" title="Delete Student">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Empty State -->
+            <div th:if="${totalStudents == 0}" class="empty-state">
+                <i class="fas fa-users empty-icon mb-4"></i>
+                <h4 class="text-muted mb-3">No Students Found</h4>
+                <p class="text-muted mb-4">Start by adding your first student using the registration form above.</p>
+                <button class="btn btn-modern" onclick="document.querySelector('.form-modern').scrollIntoView({behavior: 'smooth'})">
+                    <i class="fas fa-user-plus me-2"></i>Add First Student
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Floating Action Buttons -->
+<div class="floating-action">
+    <button class="action-btn pulse" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" title="Scroll to Top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+    <button class="action-btn" onclick="window.print()" title="Print Page">
+        <i class="fas fa-print"></i>
+    </button>
+    <a href="/search" class="action-btn" title="Search Students">
+        <i class="fas fa-search"></i>
+    </a>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6 text-center text-md-start">
+                <h5 class="mb-3"><i class="fas fa-graduation-cap me-2"></i>Student Management System</h5>
+                <p class="mb-0 opacity-75">Developed By Ram kumar</p>
+            </div>
+            <div class="col-md-6 text-center text-md-end mt-3 mt-md-0">
+                <div class="d-flex justify-content-center justify-content-md-end gap-3">
+                    <a href="#" class="text-white opacity-75"><i class="fab fa-github fa-lg"></i></a>
+                    <a href="#" class="text-white opacity-75"><i class="fab fa-linkedin fa-lg"></i></a>
+                    <a href="#" class="text-white opacity-75"><i class="fas fa-envelope fa-lg"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Theme Toggle Functionality
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const body = document.body;
+
+    // Check for saved theme or prefer-color-scheme
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    if (savedTheme === 'dark') {
+        body.setAttribute('data-theme', 'dark');
+        themeIcon.className = 'fas fa-sun';
+        themeIcon.style.color = '#FFD700';
+    }
+
+    themeToggle.addEventListener('click', () => {
+        if (body.getAttribute('data-theme') === 'dark') {
+            body.removeAttribute('data-theme');
+            themeIcon.className = 'fas fa-moon';
+            themeIcon.style.color = '';
+            localStorage.setItem('theme', 'light');
+        } else {
+            body.setAttribute('data-theme', 'dark');
+            themeIcon.className = 'fas fa-sun';
+            themeIcon.style.color = '#FFD700';
+            localStorage.setItem('theme', 'dark');
+        }
+
+        // Force color updates for all elements
+        updateThemeColors();
+    });
+
+    // Function to update all text colors
+    function updateThemeColors() {
+        const isDark = body.getAttribute('data-theme') === 'dark';
+
+        // Update all text elements
+        document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, span, div, td, th, label, input, select, textarea')
+            .forEach(el => {
+                if (!el.classList.contains('alert') &&
+                    !el.classList.contains('btn-modern') &&
+                    !el.classList.contains('btn-action') &&
+                    !el.closest('.hero-section') &&
+                    !el.closest('.form-header') &&
+                    !el.closest('.table-modern thead') &&
+                    !el.closest('.footer') &&
+                    !el.classList.contains('badge-modern')) {
+                    el.style.color = isDark ? '#ffffff' : '#2c3e50';
+                }
+            });
+    }
+
+    // Form validation functions
+    function validateRollNo() {
+        const rollNo = document.getElementById('rollNo');
+        const error = document.getElementById('rollNoError');
+        if (rollNo.value <= 0) {
+            error.style.display = 'block';
+            return false;
+        }
+        error.style.display = 'none';
+        return true;
+    }
+
+    function validateName() {
+        const name = document.getElementById('name');
+        const error = document.getElementById('nameError');
+        if (name.value.trim() === '') {
+            error.style.display = 'block';
+            return false;
+        }
+        error.style.display = 'none';
+        return true;
+    }
+
+    function validateAge() {
+        const age = document.getElementById('age');
+        const error = document.getElementById('ageError');
+        if (age.value < 15 || age.value > 60) {
+            error.style.display = 'block';
+            return false;
+        }
+        error.style.display = 'none';
+        return true;
+    }
+
+    function validateEmail() {
+        const email = document.getElementById('email');
+        const error = document.getElementById('emailError');
+        if (!email.value.includes('@') || !email.value.includes('.')) {
+            error.style.display = 'block';
+            return false;
+        }
+        error.style.display = 'none';
+        return true;
+    }
+
+    function validateCourse() {
+        const course = document.getElementById('course');
+        const error = document.getElementById('courseError');
+        if (course.value.trim() === '') {
+            error.style.display = 'block';
+            return false;
+        }
+        error.style.display = 'none';
+        return true;
+    }
+
+    function validateMarks() {
+        const marks = document.getElementById('marks');
+        const error = document.getElementById('marksError');
+        if (marks.value < 0 || marks.value > 100) {
+            error.style.display = 'block';
+            return false;
+        }
+        error.style.display = 'none';
+        return true;
+    }
+
+    function validateForm() {
+        const isValid = validateRollNo() && validateName() && validateAge() &&
+                       validateEmail() && validateCourse() && validateMarks();
+
+        if (isValid) {
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Adding...';
+            submitBtn.disabled = true;
+            return true;
+        }
+        return false;
+    }
+
+    // Delete confirmation with student name
+    function confirmDelete(form, studentName) {
+        if (confirm(`Are you sure you want to delete ${studentName}?`)) {
+            const button = form.querySelector('button');
+            const originalHtml = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            button.disabled = true;
+            return true;
+        }
+        return false;
+    }
+
+    // Debug form submission
+    document.getElementById('addStudentForm').addEventListener('submit', function(e) {
+        console.log('=== FORM SUBMISSION DEBUG ===');
+        const formData = new FormData(this);
+        for (let [key, value] of formData.entries()) {
+            console.log(`${key}: ${value}`);
+        }
+    });
+
+    // Add animation to elements on scroll
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+
+    // Observe all stat cards and forms
+    document.querySelectorAll('.stat-card, .form-modern, .table-modern').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(20px)';
+        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(el);
+    });
+
+    // Form input focus effects
+    document.querySelectorAll('.form-control-modern').forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.style.transform = 'translateY(-5px)';
+        });
+
+        input.addEventListener('blur', function() {
+            this.parentElement.style.transform = 'translateY(0)';
+        });
+    });
+
+    // Add ripple effect to buttons
+    document.querySelectorAll('.btn-modern, .action-btn').forEach(button => {
+        button.addEventListener('click', function(e) {
+            const ripple = document.createElement('span');
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+
+            ripple.style.cssText = `
+                position: absolute;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.7);
+                transform: scale(0);
+                animation: ripple 0.6s linear;
+                width: ${size}px;
+                height: ${size}px;
+                top: ${y}px;
+                left: ${x}px;
+            `;
+
+            this.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 600);
+        });
+    });
+
+    // Add CSS for ripple animation
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+
+    // Auto-dismiss alerts after 5 seconds
+    setTimeout(() => {
+        document.querySelectorAll('.alert').forEach(alert => {
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        });
+    }, 5000);
+
+    // Initialize theme colors on load
+    document.addEventListener('DOMContentLoaded', function() {
+        updateThemeColors();
+    });
+
+    // Show welcome message on first load
+    if (!sessionStorage.getItem('welcomeShown')) {
+        sessionStorage.setItem('welcomeShown', 'true');
+        console.log('Welcome to LPU Student Management System!');
+    }
+</script>
+</body>
+</html>

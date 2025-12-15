@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics - LPU</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #2c3e50;
+            --border-color: #e9ecef;
+            --shadow: 0 10px 30px rgba(0,0,0,0.1);
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-success: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            --gradient-warning: linear-gradient(135deg, #f46b45 0%, #eea849 100%);
+            --gradient-info: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --text-color: #ffffff;
+            --border-color: #404040;
+            --shadow: 0 10px 30px rgba(0,0,0,0.3);
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-success: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            --gradient-warning: linear-gradient(135deg, #f46b45 0%, #eea849 100%);
+            --gradient-info: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            padding: 10px 15px;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .navbar-modern {
+            background: var(--gradient) !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .hero-section {
+            background: var(--gradient);
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="rgba(255,255,255,0.1)"><polygon points="1000,100 1000,0 0,100"/></svg>');
+            background-size: cover;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: none;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .stat-card-primary::before {
+            background: var(--gradient);
+        }
+
+        .stat-card-success::before {
+            background: var(--gradient-success);
+        }
+
+        .stat-card-warning::before {
+            background: var(--gradient-warning);
+        }
+
+        .stat-card-info::before {
+            background: var(--gradient-info);
+        }
+
+        .stat-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .stat-icon-primary {
+            background: var(--gradient);
+        }
+
+        .stat-icon-success {
+            background: var(--gradient-success);
+        }
+
+        .stat-icon-warning {
+            background: var(--gradient-warning);
+        }
+
+        .stat-icon-info {
+            background: var(--gradient-info);
+        }
+
+        .topper-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            border: none;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .topper-header {
+            background: var(--gradient-warning);
+            color: white;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .topper-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="rgba(255,255,255,0.1)"><polygon points="1000,100 1000,0 0,100"/></svg>');
+            background-size: cover;
+        }
+
+        .topper-body {
+            padding: 30px;
+            text-align: center;
+        }
+
+        .topper-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: var(--gradient-warning);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+            color: white;
+            margin: -65px auto 20px;
+            border: 5px solid var(--card-bg);
+            box-shadow: var(--shadow);
+        }
+
+        .action-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            border: none;
+            padding: 25px;
+        }
+
+        .chart-container {
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            border: none;
+            padding: 25px;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .chart-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        .btn-modern {
+            background: var(--gradient);
+            border: none;
+            border-radius: 12px;
+            padding: 12px 25px;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            color: white;
+        }
+
+        .btn-success-modern {
+            background: var(--gradient-success);
+        }
+
+        .btn-info-modern {
+            background: var(--gradient-info);
+        }
+
+        .badge-modern {
+            border-radius: 20px;
+            padding: 8px 15px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .floating-action {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+        }
+
+        .action-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--gradient);
+            color: white;
+            border: none;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1) rotate(10deg);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(52, 152, 219, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); }
+        }
+
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 40px 0;
+            }
+
+            .stat-card {
+                margin-bottom: 20px;
+            }
+
+            .floating-action {
+                bottom: 20px;
+                right: 20px;
+            }
+
+            .chart-wrapper {
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Theme Toggle -->
+<div class="theme-toggle" id="themeToggle">
+    <i class="fas fa-moon" id="themeIcon"></i>
+</div>
+
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark navbar-modern">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/">
+            <i class="fas fa-graduation-cap me-2"></i>
+            LPU Student Management
+        </a>
+        <div class="navbar-nav ms-auto">
+            <a class="nav-link" href="/">
+                <i class="fas fa-home me-1"></i>Dashboard
+            </a>
+            <a class="nav-link" href="/search">
+                <i class="fas fa-search me-1"></i>Search
+            </a>
+            <a class="nav-link active" href="/statistics">
+                <i class="fas fa-chart-bar me-1"></i>Analytics
+            </a>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <h1 class="display-4 fw-bold mb-4">Academic Analytics</h1>
+                <p class="lead mb-4">Comprehensive insights into student performance and institutional metrics</p>
+                <div class="d-flex gap-3 justify-content-center flex-wrap">
+                        <span class="badge bg-light text-dark fs-6 p-3">
+                            <i class="fas fa-chart-pie me-2"></i>
+                            Performance Metrics
+                        </span>
+                    <span class="badge bg-light text-dark fs-6 p-3">
+                            <i class="fas fa-trophy me-2"></i>
+                            Achievement Tracking
+                        </span>
+                    <span class="badge bg-light text-dark fs-6 p-3">
+                            <i class="fas fa-trending-up me-2"></i>
+                            Growth Analytics
+                        </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main Content -->
+<div class="container py-5">
+    <!-- Statistics Cards -->
+    <div class="row mb-5">
+        <div class="col-md-3 mb-4">
+            <div class="stat-card stat-card-primary">
+                <div class="stat-icon stat-icon-primary">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h2 class="fw-bold display-6" th:text="${totalStudents}">0</h2>
+                <p class="text-muted mb-0">Total Students</p>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="stat-card stat-card-success">
+                <div class="stat-icon stat-icon-success">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h2 class="fw-bold display-6" th:text="${averageMarks} ?: '0'">0</h2>
+                <p class="text-muted mb-0">Average Marks</p>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="stat-card stat-card-warning">
+                <div class="stat-icon stat-icon-warning">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <h2 class="fw-bold display-6" th:text="${maxMarks} ?: '0'">0</h2>
+                <p class="text-muted mb-0">Highest Marks</p>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="stat-card stat-card-info">
+                <div class="stat-icon stat-icon-info">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <h2 class="fw-bold display-6" th:text="${minMarks} ?: '0'">0</h2>
+                <p class="text-muted mb-0">Lowest Marks</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="row mb-5">
+        <div class="col-md-6 mb-4">
+            <div class="chart-container">
+                <h4 class="chart-title">
+                    <i class="fas fa-chart-pie text-primary"></i>
+                    Grade Distribution
+                </h4>
+                <div class="chart-wrapper">
+                    <canvas id="gradeChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="chart-container">
+                <h4 class="chart-title">
+                    <i class="fas fa-chart-bar text-success"></i>
+                    Performance Trends
+                </h4>
+                <div class="chart-wrapper">
+                    <canvas id="performanceChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="chart-container">
+                <h4 class="chart-title">
+                    <i class="fas fa-chart-line text-warning"></i>
+                    Course-wise Average
+                </h4>
+                <div class="chart-wrapper">
+                    <canvas id="courseChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="chart-container">
+                <h4 class="chart-title">
+                    <i class="fas fa-bullseye text-info"></i>
+                    Marks Distribution
+                </h4>
+                <div class="chart-wrapper">
+                    <canvas id="marksDistributionChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Topper Section -->
+    <div th:if="${topper}" class="row mb-5">
+        <div class="col-12">
+            <div class="topper-card">
+                <div class="topper-header">
+                    <h3 class="mb-0"><i class="fas fa-crown me-2"></i>Class Topper</h3>
+                </div>
+                <div class="topper-body">
+                    <div class="topper-avatar">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <h3 th:text="${topper.name}" class="fw-bold mb-2">Rahul Sharma</h3>
+                    <div class="row justify-content-center mb-3">
+                        <div class="col-md-8">
+                            <div class="row">
+                                <div class="col-md-4 mb-2">
+                                    <strong>Roll No:</strong> <span th:text="${topper.rollNo}">101</span>
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <strong>Course:</strong> <span th:text="${topper.course}">B.Tech CSE</span>
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <strong>Marks:</strong> <span th:text="${topper.marks} + '/100'">95/100</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                            <span class="badge badge-modern bg-warning fs-6">
+                                <i class="fas fa-star me-1"></i>
+                                Grade: <span th:text="${topper.grade}">A+</span>
+                            </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="action-card text-center">
+                <h4 class="mb-4"><i class="fas fa-bolt me-2"></i>Quick Actions</h4>
+                <div class="d-flex gap-3 justify-content-center flex-wrap">
+                    <a th:href="@{/}" class="btn btn-modern">
+                        <i class="fas fa-home me-2"></i> Dashboard
+                    </a>
+                    <a th:href="@{/search}" class="btn btn-success-modern">
+                        <i class="fas fa-search me-2"></i> Search Students
+                    </a>
+                    <button class="btn btn-info-modern" onclick="window.print()">
+                        <i class="fas fa-print me-2"></i> Print Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Floating Action Buttons -->
+<div class="floating-action">
+    <button class="action-btn pulse" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" title="Scroll to Top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+    <button class="action-btn" onclick="window.print()" title="Print Report">
+        <i class="fas fa-print"></i>
+    </button>
+    <a href="/" class="action-btn" title="Dashboard">
+        <i class="fas fa-home"></i>
+    </a>
+</div>
+
+<!-- Footer -->
+<footer class="bg-dark text-white text-center py-4 mt-5">
+    <div class="container">
+        <p class="mb-0">
+            <i class="fas fa-graduation-cap"></i>
+            Student Management System - Developed By Ram kumar
+        </p>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Theme Toggle Functionality
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const body = document.body;
+
+    // Check for saved theme or prefer-color-scheme
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    if (savedTheme === 'dark') {
+        body.setAttribute('data-theme', 'dark');
+        themeIcon.className = 'fas fa-sun';
+    }
+
+    themeToggle.addEventListener('click', () => {
+        if (body.getAttribute('data-theme') === 'dark') {
+            body.removeAttribute('data-theme');
+            themeIcon.className = 'fas fa-moon';
+            localStorage.setItem('theme', 'light');
+        } else {
+            body.setAttribute('data-theme', 'dark');
+            themeIcon.className = 'fas fa-sun';
+            localStorage.setItem('theme', 'dark');
+        }
+        // Update charts when theme changes
+        updateChartColors();
+    });
+
+    // Chart.js Implementation
+    let gradeChart, performanceChart, courseChart, marksDistributionChart;
+
+    function initializeCharts() {
+        const isDarkTheme = body.getAttribute('data-theme') === 'dark';
+        const textColor = isDarkTheme ? '#ffffff' : '#2c3e50';
+        const gridColor = isDarkTheme ? '#404040' : '#e9ecef';
+
+        // Grade Distribution Chart (Pie)
+        const gradeCtx = document.getElementById('gradeChart').getContext('2d');
+        gradeChart = new Chart(gradeCtx, {
+            type: 'pie',
+            data: {
+                labels: ['A+ (90-100)', 'A (80-89)', 'B+ (70-79)', 'B (60-69)', 'C (50-59)', 'D (40-49)', 'F (<40)'],
+                datasets: [{
+                    data: [12, 25, 30, 18, 8, 4, 3],
+                    backgroundColor: [
+                        '#27ae60', '#2ecc71', '#3498db', '#9b59b6',
+                        '#f39c12', '#e67e22', '#e74c3c'
+                    ],
+                    borderWidth: 2,
+                    borderColor: isDarkTheme ? '#2d2d2d' : '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: textColor,
+                            font: {
+                                size: 11
+                            }
+                        }
+                    },
+                    title: {
+                        display: false
+                    }
+                }
+            }
+        });
+
+        // Performance Trends Chart (Line)
+        const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+        performanceChart = new Chart(performanceCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Average Marks',
+                    data: [65, 68, 72, 75, 78, 82],
+                    borderColor: '#3498db',
+                    backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4
+                }, {
+                    label: 'Highest Marks',
+                    data: [85, 88, 90, 92, 94, 96],
+                    borderColor: '#27ae60',
+                    backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: textColor
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            color: gridColor
+                        },
+                        ticks: {
+                            color: textColor
+                        }
+                    },
+                    y: {
+                        grid: {
+                            color: gridColor
+                        },
+                        ticks: {
+                            color: textColor
+                        },
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            }
+        });
+
+        // Course-wise Average Chart (Bar)
+        const courseCtx = document.getElementById('courseChart').getContext('2d');
+        courseChart = new Chart(courseCtx, {
+            type: 'bar',
+            data: {
+                labels: ['B.Tech CSE', 'B.Tech ME', 'B.Tech CE', 'BBA', 'MBA', 'B.Com'],
+                datasets: [{
+                    label: 'Average Marks',
+                    data: [78, 72, 68, 75, 80, 70],
+                    backgroundColor: [
+                        'rgba(52, 152, 219, 0.8)',
+                        'rgba(155, 89, 182, 0.8)',
+                        'rgba(52, 152, 219, 0.8)',
+                        'rgba(46, 204, 113, 0.8)',
+                        'rgba(241, 196, 15, 0.8)',
+                        'rgba(230, 126, 34, 0.8)'
+                    ],
+                    borderColor: [
+                        '#3498db',
+                        '#9b59b6',
+                        '#3498db',
+                        '#2ecc71',
+                        '#f1c40f',
+                        '#e67e22'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            color: gridColor
+                        },
+                        ticks: {
+                            color: textColor
+                        }
+                    },
+                    y: {
+                        grid: {
+                            color: gridColor
+                        },
+                        ticks: {
+                            color: textColor
+                        },
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            }
+        });
+
+        // Marks Distribution Chart (Doughnut)
+        const marksCtx = document.getElementById('marksDistributionChart').getContext('2d');
+        marksDistributionChart = new Chart(marksCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Excellent (80-100)', 'Good (60-79)', 'Average (40-59)', 'Needs Improvement (<40)'],
+                datasets: [{
+                    data: [35, 45, 15, 5],
+                    backgroundColor: [
+                        '#27ae60',
+                        '#3498db',
+                        '#f39c12',
+                        '#e74c3c'
+                    ],
+                    borderWidth: 3,
+                    borderColor: isDarkTheme ? '#2d2d2d' : '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '60%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: textColor,
+                            font: {
+                                size: 11
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function updateChartColors() {
+        const isDarkTheme = body.getAttribute('data-theme') === 'dark';
+        const textColor = isDarkTheme ? '#ffffff' : '#2c3e50';
+        const gridColor = isDarkTheme ? '#404040' : '#e9ecef';
+
+        // Update all charts with new colors
+        const charts = [gradeChart, performanceChart, courseChart, marksDistributionChart];
+        charts.forEach(chart => {
+            if (chart) {
+                chart.options.plugins.legend.labels.color = textColor;
+                if (chart.options.scales) {
+                    if (chart.options.scales.x) {
+                        chart.options.scales.x.ticks.color = textColor;
+                        chart.options.scales.x.grid.color = gridColor;
+                    }
+                    if (chart.options.scales.y) {
+                        chart.options.scales.y.ticks.color = textColor;
+                        chart.options.scales.y.grid.color = gridColor;
+                    }
+                }
+                chart.update();
+            }
+        });
+    }
+
+    // Initialize charts when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeCharts();
+
+        const cards = document.querySelectorAll('.stat-card');
+        cards.forEach((card, index) => {
+            card.style.animationDelay = `${index * 0.1}s`;
+        });
+    });
+
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.querySelector(this.getAttribute('href')).scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+    });
+</script>
+</body>
+</html>

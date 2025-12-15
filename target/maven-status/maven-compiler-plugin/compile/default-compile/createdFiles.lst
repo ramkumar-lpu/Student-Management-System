@@ -1,0 +1,6 @@
+com\lpu\studentmanagement\repository\StudentRepository.class
+com\lpu\studentmanagement\StudentManagementWebApplication.class
+com\lpu\studentmanagement\entity\Student.class
+com\lpu\studentmanagement\service\StudentService.class
+com\lpu\studentmanagement\controller\StudentController.class
+com\lpu\studentmanagement\ServletInitializer.class
