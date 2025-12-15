@@ -37,7 +37,7 @@ The **Student Management System** is a comprehensive web application built to di
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/yourusername/student-management-system.git
+git clone https://github.com/ram9219/student-management-system.git
 cd student-management-system
 
 # 2. Configure database
@@ -55,3 +55,56 @@ mvn spring-boot:run
 
 # 5. Access the application
 # Open browser: http://localhost:8080
+
+
+🏗️ System Architecture
+Three-Tier Architecture
+┌─────────────────┐     HTTP Requests/Responses     ┌─────────────────┐
+│  Presentation   │ ──────────────────────────────> │   Business      │
+│     Layer       │                                 │   Logic Layer   │
+│  (HTML/CSS/JS)  │ <────────────────────────────── │ (Spring MVC)    │
+└─────────────────┘                                 └─────────────────┘
+                                                              ↓
+                                                       Data Operations
+                                                              ↓
+                                                    ┌─────────────────┐
+                                                    │    Data Layer   │
+                                                    │ (Spring Data JPA)│
+                                                    └─────────────────┘
+                                                              ↓
+                                                    ┌─────────────────┐
+                                                    │    Database     │
+                                                    │     (MySQL)     │
+                                                    └─────────────────┘
+
+📋 Modules & Workflow
+graph TD
+    A[User Login] --> B[Dashboard]
+    B --> C{Select Module}
+    C --> D[Student Management]
+    C --> E[Search Students]
+    C --> F[Analytics]
+    C --> G[Generate ID Cards]
+    
+    D --> H[Add/Edit/Delete]
+    E --> I[Multi-criteria Search]
+    F --> J[View Charts & Reports]
+    G --> K[Print/Save ID Cards]
+    
+    H --> L[Database Update]
+    I --> L
+    J --> L
+    K --> L
+    
+    L --> M[Real-time UI Update]
+
+🔒 Security Features
+✅ Input Validation – Client-side & server-side validation
+
+✅ SQL Injection Prevention – Prepared statements via JPA
+
+✅ XSS Protection – Thymeleaf auto-escaping
+
+✅ Session Management – Secure user sessions
+
+✅ Data Sanitization – Clean input before processing
